@@ -11,7 +11,7 @@
   },
   "servers": [
     {
-      "url": "https://birthpath-support-inbox.god175.workers.dev"
+      "url": "https://inbox.birthpath.app"
     }
   ],
   "security": [

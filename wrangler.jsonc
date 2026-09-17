@@ -4,6 +4,12 @@
 	"account_id": "8d8813a2de080c1710c6316e432826aa",
 	"compatibility_date": "2025-11-28",
 	"main": "./workers/app.ts",
+	"routes": [
+		{
+			"pattern": "inbox.birthpath.app",
+			"custom_domain": true
+		}
+	],
 	"observability": {
 		"enabled": true
 	},

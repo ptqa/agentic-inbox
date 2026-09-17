@@ -19,7 +19,7 @@ function routePaths() {
 
 test("OpenAPI document has valid structure, refs, and API authentication", () => {
 	assert.equal(document.openapi, "3.1.0");
-	assert.equal(document.servers[0].url, "https://birthpath-support-inbox.god175.workers.dev");
+	assert.equal(document.servers[0].url, "https://inbox.birthpath.app");
 	assert.deepEqual(document.security, [{ bearerAuth: [] }]);
 	assert.equal(document.components.securitySchemes.bearerAuth.type, "http");
 	assert.equal(document.components.securitySchemes.bearerAuth.scheme, "bearer");
