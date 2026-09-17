@@ -1,0 +1,1834 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "BirthPath Support Inbox API",
+    "version": "1.0.0",
+    "description": "REST API for managing BirthPath support mailboxes, messages, drafts, folders, threads, search, and attachments.",
+    "license": {
+      "name": "Apache-2.0",
+      "identifier": "Apache-2.0"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://birthpath-support-inbox.god175.workers.dev"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Discovery",
+      "description": "API metadata and runtime configuration."
+    },
+    {
+      "name": "Mailboxes",
+      "description": "Mailbox creation, settings, and removal."
+    },
+    {
+      "name": "Emails",
+      "description": "Email, draft, reply, and forwarding operations."
+    },
+    {
+      "name": "Threads",
+      "description": "Conversation retrieval and read state."
+    },
+    {
+      "name": "Folders",
+      "description": "Mailbox folder management."
+    },
+    {
+      "name": "Search",
+      "description": "Filtered mailbox search."
+    },
+    {
+      "name": "Attachments",
+      "description": "Binary attachment downloads."
+    }
+  ],
+  "paths": {
+    "/api/openapi.json": {
+      "get": {
+        "operationId": "getOpenApiDocument",
+        "summary": "Get the OpenAPI document",
+        "tags": [
+          "Discovery"
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "OpenAPI document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/config": {
+      "get": {
+        "operationId": "getConfig",
+        "summary": "Get configured domains and email addresses",
+        "tags": [
+          "Discovery"
+        ],
+        "responses": {
+          "200": {
+            "description": "Runtime configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Config"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/api/v1/mailboxes": {
+      "get": {
+        "operationId": "listMailboxes",
+        "summary": "List mailboxes",
+        "tags": [
+          "Mailboxes"
+        ],
+        "responses": {
+          "200": {
+            "description": "Mailboxes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Mailbox"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createMailbox",
+        "summary": "Create a mailbox",
+        "tags": [
+          "Mailboxes"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMailboxRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Mailbox created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mailbox"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/api/v1/mailboxes/{mailboxId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/MailboxId"
+        }
+      ],
+      "get": {
+        "operationId": "getMailbox",
+        "summary": "Get a mailbox",
+        "tags": [
+          "Mailboxes"
+        ],
+        "responses": {
+          "200": {
+            "description": "Mailbox",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mailbox"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateMailbox",
+        "summary": "Replace mailbox settings",
+        "tags": [
+          "Mailboxes"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMailboxRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mailbox updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Mailbox"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteMailbox",
+        "summary": "Delete a mailbox",
+        "tags": [
+          "Mailboxes"
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/mailboxes/{mailboxId}/emails": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/MailboxId"
+        }
+      ],
+      "get": {
+        "operationId": "listEmails",
+        "summary": "List mailbox emails",
+        "tags": [
+          "Emails"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FolderQuery"
+          },
+          {
+            "$ref": "#/components/parameters/ThreadIdQuery"
+          },
+          {
+            "$ref": "#/components/parameters/ThreadedQuery"
+          },
+          {
+            "$ref": "#/components/parameters/PageQuery"
+          },
+          {
+            "$ref": "#/components/parameters/LimitQuery"
+          },
+          {
+            "name": "sortColumn",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "date",
+                "subject",
+                "sender",
+                "recipient",
+                "read",
+                "starred"
+              ]
+            }
+          },
+          {
+            "name": "sortDirection",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Emails, or paginated emails when folder is supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EmailMetadata"
+                      }
+                    },
+                    {
+                      "$ref": "#/components/schemas/PaginatedEmails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "post": {
+        "operationId": "sendEmail",
+        "summary": "Send a new email",
+        "tags": [
+          "Emails"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendEmailRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Email accepted for delivery",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendEmailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        }
+      }
+    },
+    "/api/v1/mailboxes/{mailboxId}/drafts": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/MailboxId"
+        }
+      ],
+      "post": {
+        "operationId": "createDraft",
+        "summary": "Create or replace a draft",
+        "tags": [
+          "Emails"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DraftRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Draft created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DraftResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/mailboxes/{mailboxId}/emails/{id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/MailboxId"
+        },
+        {
+          "$ref": "#/components/parameters/EmailId"
+        }
+      ],
+      "get": {
+        "operationId": "getEmail",
+        "summary": "Get an email",
+        "tags": [
+          "Emails"
+        ],
+        "responses": {
+          "200": {
+            "description": "Email",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailFull"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateEmail",
+        "summary": "Update read and starred flags",
+        "tags": [
+          "Emails"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEmailRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailFull"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteEmail",
+        "summary": "Delete an email",
+        "tags": [
+          "Emails"
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/mailboxes/{mailboxId}/emails/{id}/move": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/MailboxId"
+        },
+        {
+          "$ref": "#/components/parameters/EmailId"
+        }
+      ],
+      "post": {
+        "operationId": "moveEmail",
+        "summary": "Move an email to another folder",
+        "tags": [
+          "Emails"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveEmailRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email moved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/mailboxes/{mailboxId}/threads/{threadId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/MailboxId"
+        },
+        {
+          "$ref": "#/components/parameters/ThreadId"
+        }
+      ],
+      "get": {
+        "operationId": "getThread",
+        "summary": "Get all emails in a thread",
+        "tags": [
+          "Threads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Thread emails",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EmailFull"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/mailboxes/{mailboxId}/threads/{threadId}/read": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/MailboxId"
+        },
+        {
+          "$ref": "#/components/parameters/ThreadId"
+        }
+      ],
+      "post": {
+        "operationId": "markThreadRead",
+        "summary": "Mark a thread as read",
+        "tags": [
+          "Threads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Thread marked read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/mailboxes/{mailboxId}/emails/{id}/reply": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/MailboxId"
+        },
+        {
+          "$ref": "#/components/parameters/EmailId"
+        }
+      ],
+      "post": {
+        "operationId": "replyToEmail",
+        "summary": "Reply to an email",
+        "tags": [
+          "Emails"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendEmailRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Reply accepted for delivery",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendEmailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        }
+      }
+    },
+    "/api/v1/mailboxes/{mailboxId}/emails/{id}/forward": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/MailboxId"
+        },
+        {
+          "$ref": "#/components/parameters/EmailId"
+        }
+      ],
+      "post": {
+        "operationId": "forwardEmail",
+        "summary": "Forward an email",
+        "tags": [
+          "Emails"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendEmailRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Forward accepted for delivery",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendEmailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        }
+      }
+    },
+    "/api/v1/mailboxes/{mailboxId}/folders": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/MailboxId"
+        }
+      ],
+      "get": {
+        "operationId": "listFolders",
+        "summary": "List mailbox folders",
+        "tags": [
+          "Folders"
+        ],
+        "responses": {
+          "200": {
+            "description": "Folders",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Folder"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createFolder",
+        "summary": "Create a custom folder",
+        "tags": [
+          "Folders"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFolderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Folder created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Folder"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/api/v1/mailboxes/{mailboxId}/folders/{id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/MailboxId"
+        },
+        {
+          "$ref": "#/components/parameters/FolderId"
+        }
+      ],
+      "put": {
+        "operationId": "updateFolder",
+        "summary": "Rename a folder",
+        "tags": [
+          "Folders"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFolderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Folder updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Folder"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteFolder",
+        "summary": "Delete a folder",
+        "tags": [
+          "Folders"
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/mailboxes/{mailboxId}/search": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/MailboxId"
+        }
+      ],
+      "get": {
+        "operationId": "searchEmails",
+        "summary": "Search mailbox emails",
+        "tags": [
+          "Search"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/QueryQuery"
+          },
+          {
+            "$ref": "#/components/parameters/FolderQuery"
+          },
+          {
+            "$ref": "#/components/parameters/FromQuery"
+          },
+          {
+            "$ref": "#/components/parameters/ToQuery"
+          },
+          {
+            "$ref": "#/components/parameters/SubjectQuery"
+          },
+          {
+            "$ref": "#/components/parameters/DateStartQuery"
+          },
+          {
+            "$ref": "#/components/parameters/DateEndQuery"
+          },
+          {
+            "$ref": "#/components/parameters/IsReadQuery"
+          },
+          {
+            "$ref": "#/components/parameters/IsStarredQuery"
+          },
+          {
+            "$ref": "#/components/parameters/HasAttachmentQuery"
+          },
+          {
+            "$ref": "#/components/parameters/PageQuery"
+          },
+          {
+            "$ref": "#/components/parameters/LimitQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedEmails"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/mailboxes/{mailboxId}/emails/{emailId}/attachments/{attachmentId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/MailboxId"
+        },
+        {
+          "$ref": "#/components/parameters/EmailIdByEmailId"
+        },
+        {
+          "$ref": "#/components/parameters/AttachmentId"
+        }
+      ],
+      "get": {
+        "operationId": "downloadAttachment",
+        "summary": "Download an email attachment",
+        "tags": [
+          "Attachments"
+        ],
+        "responses": {
+          "200": {
+            "description": "Attachment contents",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "API key",
+        "description": "Use the API key configured as the Worker's API_KEY secret."
+      }
+    },
+    "parameters": {
+      "MailboxId": {
+        "name": "mailboxId",
+        "in": "path",
+        "required": true,
+        "description": "Mailbox email address, URL-encoded when needed.",
+        "schema": {
+          "type": "string",
+          "format": "email"
+        }
+      },
+      "EmailId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "EmailIdByEmailId": {
+        "name": "emailId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ThreadId": {
+        "name": "threadId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "FolderId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "AttachmentId": {
+        "name": "attachmentId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "FolderQuery": {
+        "name": "folder",
+        "in": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ThreadIdQuery": {
+        "name": "thread_id",
+        "in": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ThreadedQuery": {
+        "name": "threaded",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      "PageQuery": {
+        "name": "page",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "LimitQuery": {
+        "name": "limit",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "QueryQuery": {
+        "name": "query",
+        "in": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "FromQuery": {
+        "name": "from",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "email"
+        }
+      },
+      "ToQuery": {
+        "name": "to",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "email"
+        }
+      },
+      "SubjectQuery": {
+        "name": "subject",
+        "in": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "DateStartQuery": {
+        "name": "date_start",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "DateEndQuery": {
+        "name": "date_end",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "IsReadQuery": {
+        "name": "is_read",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      "IsStarredQuery": {
+        "name": "is_starred",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      "HasAttachmentQuery": {
+        "name": "has_attachment",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Invalid request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Forbidden",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "Resource conflict",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "RateLimited": {
+        "description": "Rate limit exceeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "NoContent": {
+        "description": "Success with no response body"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "Config": {
+        "type": "object",
+        "required": [
+          "domains",
+          "emailAddresses"
+        ],
+        "properties": {
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "emailAddresses": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "email"
+            }
+          }
+        }
+      },
+      "MailboxSettings": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "fromName": {
+            "type": "string"
+          },
+          "forwarding": {
+            "$ref": "#/components/schemas/ForwardingSettings"
+          },
+          "signature": {
+            "$ref": "#/components/schemas/SignatureSettings"
+          },
+          "autoReply": {
+            "$ref": "#/components/schemas/AutoReplySettings"
+          }
+        }
+      },
+      "ForwardingSettings": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        }
+      },
+      "SignatureSettings": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "text": {
+            "type": "string"
+          }
+        }
+      },
+      "AutoReplySettings": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "Mailbox": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "email",
+          "settings"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "email"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/MailboxSettings"
+          }
+        }
+      },
+      "CreateMailboxRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "name"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "settings": {
+            "$ref": "#/components/schemas/MailboxSettings"
+          }
+        }
+      },
+      "UpdateMailboxRequest": {
+        "type": "object",
+        "required": [
+          "settings"
+        ],
+        "properties": {
+          "settings": {
+            "$ref": "#/components/schemas/MailboxSettings"
+          }
+        }
+      },
+      "EmailMetadata": {
+        "type": "object",
+        "required": [
+          "id",
+          "subject",
+          "sender",
+          "recipient",
+          "date",
+          "read",
+          "starred"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "sender": {
+            "type": "string"
+          },
+          "recipient": {
+            "type": "string"
+          },
+          "cc": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "bcc": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "read": {
+            "type": "boolean"
+          },
+          "starred": {
+            "type": "boolean"
+          },
+          "in_reply_to": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "email_references": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "thread_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "folder_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "snippet": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "thread_count": {
+            "type": "integer"
+          },
+          "thread_unread_count": {
+            "type": "integer"
+          },
+          "participants": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "needs_reply": {
+            "type": "boolean"
+          },
+          "has_draft": {
+            "type": "boolean"
+          }
+        }
+      },
+      "EmailFull": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EmailMetadata"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "body": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "message_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "raw_headers": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "attachments": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Attachment"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Attachment": {
+        "type": "object",
+        "required": [
+          "id",
+          "filename",
+          "mimetype",
+          "size"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "mimetype": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "content_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "disposition": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "Recipient": {
+        "oneOf": [
+          {
+            "type": "string",
+            "format": "email"
+          },
+          {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "format": "email"
+            }
+          }
+        ]
+      },
+      "SendEmailRequest": {
+        "type": "object",
+        "description": "Provide at least one of html or text. Attachment content is base64-encoded.",
+        "required": [
+          "to",
+          "from",
+          "subject"
+        ],
+        "properties": {
+          "to": {
+            "$ref": "#/components/schemas/Recipient"
+          },
+          "cc": {
+            "$ref": "#/components/schemas/Recipient"
+          },
+          "bcc": {
+            "$ref": "#/components/schemas/Recipient"
+          },
+          "from": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "email"
+              },
+              {
+                "$ref": "#/components/schemas/NamedEmail"
+              }
+            ]
+          },
+          "subject": {
+            "type": "string"
+          },
+          "html": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AttachmentUpload"
+            }
+          },
+          "in_reply_to": {
+            "type": "string"
+          },
+          "references": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "thread_id": {
+            "type": "string"
+          }
+        },
+        "anyOf": [
+          {
+            "required": [
+              "html"
+            ]
+          },
+          {
+            "required": [
+              "text"
+            ]
+          }
+        ]
+      },
+      "NamedEmail": {
+        "type": "object",
+        "required": [
+          "email",
+          "name"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "AttachmentUpload": {
+        "type": "object",
+        "required": [
+          "content",
+          "filename",
+          "type",
+          "disposition"
+        ],
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "Base64-encoded file contents."
+          },
+          "filename": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "description": "MIME type."
+          },
+          "disposition": {
+            "type": "string",
+            "enum": [
+              "attachment",
+              "inline"
+            ]
+          },
+          "contentId": {
+            "type": "string"
+          }
+        }
+      },
+      "SendEmailResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "example": "sent"
+          }
+        }
+      },
+      "DraftRequest": {
+        "type": "object",
+        "required": [
+          "body"
+        ],
+        "properties": {
+          "to": {
+            "type": "string"
+          },
+          "cc": {
+            "type": "string"
+          },
+          "bcc": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "in_reply_to": {
+            "type": "string"
+          },
+          "thread_id": {
+            "type": "string"
+          },
+          "draft_id": {
+            "type": "string",
+            "description": "Existing draft to replace."
+          }
+        }
+      },
+      "DraftResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "subject",
+          "recipient",
+          "date"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "example": "draft"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "recipient": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UpdateEmailRequest": {
+        "type": "object",
+        "minProperties": 1,
+        "properties": {
+          "read": {
+            "type": "boolean"
+          },
+          "starred": {
+            "type": "boolean"
+          }
+        }
+      },
+      "MoveEmailRequest": {
+        "type": "object",
+        "required": [
+          "folderId"
+        ],
+        "properties": {
+          "folderId": {
+            "type": "string"
+          }
+        }
+      },
+      "StatusResponse": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "Folder": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "unreadCount"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "unreadCount": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "CreateFolderRequest": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "UpdateFolderRequest": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "PaginatedEmails": {
+        "type": "object",
+        "required": [
+          "emails",
+          "totalCount"
+        ],
+        "properties": {
+          "emails": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmailMetadata"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  }
+}

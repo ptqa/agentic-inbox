@@ -50,6 +50,10 @@ app.use("*", async (c, next) => {
 		return next();
 	}
 
+	if (c.req.method === "GET" && c.req.path === "/api/openapi.json") {
+		return next();
+	}
+
 	if (
 		c.req.path.startsWith("/api/")
 		&& await hasValidApiKey(c.req.header("authorization"), c.env.API_KEY)

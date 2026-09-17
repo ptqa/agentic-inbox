@@ -20,6 +20,7 @@ import { handleReplyEmail, handleForwardEmail } from "./routes/reply-forward";
 import { Folders } from "../shared/folders";
 import type { Env } from "./types";
 import { requireMailbox, type MailboxContext } from "./lib/mailbox";
+import openapiDocument from "../openapi.json";
 
 type AppContext = Context<MailboxContext>;
 
@@ -84,6 +85,8 @@ app.use("/api/*", cors({
 app.use("/api/v1/mailboxes/:mailboxId/*", requireMailbox);
 
 // -- Config ---------------------------------------------------------
+
+app.get("/api/openapi.json", (c) => c.json(openapiDocument));
 
 app.get("/api/v1/config", (c) => {
 	const domainsRaw = c.env.DOMAINS || "";
