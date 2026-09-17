@@ -11,7 +11,7 @@
   },
   "servers": [
     {
-      "url": "https://inbox.birthpath.app"
+      "url": "https://api.inbox.birthpath.app"
     }
   ],
   "security": [

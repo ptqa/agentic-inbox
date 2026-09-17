@@ -9,6 +9,10 @@
 		{
 			"pattern": "inbox.birthpath.app",
 			"custom_domain": true
+		},
+		{
+			"pattern": "api.inbox.birthpath.app",
+			"custom_domain": true
 		}
 	],
 	"observability": {
