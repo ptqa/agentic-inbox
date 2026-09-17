@@ -119,8 +119,8 @@ function splitQuotedBlock(html: string): { reply: string; quoted: string } {
  * Verify and clean a draft email body using AI.
  * Falls back to returning the original body if the AI call fails.
  */
-export async function verifyDraft(ai: Ai, body: string): Promise<string> {
-	if (!body || !body.trim()) return body;
+export async function verifyDraft(ai: Ai | undefined, body: string): Promise<string> {
+	if (!ai || !body || !body.trim()) return body;
 
 	// Separate the quoted reply block so the AI only reviews the user's text
 	const isHtml = /<[a-z][\s\S]*>/i.test(body);

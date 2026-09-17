@@ -32,6 +32,8 @@ import {
 import { Folders, FOLDER_TOOL_DESCRIPTION, MOVE_FOLDER_TOOL_DESCRIPTION } from "../../shared/folders";
 import type { Env } from "../types";
 
+type AgentEnv = Env & { AI: Ai };
+
 // AI SDK v6 changed tool() overloads significantly. We define tools as plain
 // objects matching the Tool type to avoid overload resolution issues.
 function defineTool(def: {
@@ -274,7 +276,7 @@ function createEmailTools(env: Env, mailboxId: string) {
 // is fully typed inside the tools via the closure.
 export class EmailAgent extends AIChatAgent<any> {
 	async onChatMessage(onFinish: any) {
-		const env = this.env as Env;
+		const env = this.env as AgentEnv;
 		const mailboxId = this.name;
 		const workersai = createWorkersAI({ binding: env.AI });
 		const tools = createEmailTools(env, mailboxId);
@@ -333,7 +335,7 @@ export class EmailAgent extends AIChatAgent<any> {
 		subject: string;
 		threadId: string;
 	}) {
-		const env = this.env as Env;
+		const env = this.env as AgentEnv;
 		const workersai = createWorkersAI({ binding: env.AI });
 		const tools = createEmailTools(env, emailData.mailboxId);
 		const systemPrompt = await getSystemPrompt(env, emailData.mailboxId);
