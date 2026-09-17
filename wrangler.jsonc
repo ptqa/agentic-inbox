@@ -1,6 +1,7 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "agentic-inbox",
+	"name": "birthpath-support-inbox",
+	"account_id": "8d8813a2de080c1710c6316e432826aa",
 	"compatibility_date": "2025-11-28",
 	"main": "./workers/app.ts",
 	"observability": {
@@ -13,8 +14,8 @@
 		// Production deploys must also define POLICY_AUD and TEAM_DOMAIN.
 		// TEAM_DOMAIN may be the base Access URL or the full /cdn-cgi/access/certs URL.
 		// The worker now fails closed outside local development if Access is not configured.
-		"DOMAINS": "example.com",
-		"EMAIL_ADDRESSES": []
+		"DOMAINS": "birthpath.app",
+		"EMAIL_ADDRESSES": ["support@birthpath.app"]
 	},
 	"send_email": [
 		{
@@ -25,8 +26,8 @@
 	"r2_buckets": [
 		{
 			"binding": "BUCKET",
-			"bucket_name": "agentic-inbox",
-			"preview_bucket_name": "agentic-inbox"
+			"bucket_name": "birthpath-support-inbox",
+			"preview_bucket_name": "birthpath-support-inbox"
 		}
 	],
 	"ai": {
